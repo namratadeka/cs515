@@ -71,12 +71,4 @@ class Car:
         observation = (pos + ori + vel)
 
         return observation
-
-
-
-
-
-
-
-
-
+        

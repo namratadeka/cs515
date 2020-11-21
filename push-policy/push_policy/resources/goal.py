@@ -8,5 +8,3 @@ class Goal:
         p.loadURDF(fileName=f_name,
                    basePosition=[base[0], base[1], 0],
                    physicsClientId=client)
-
-

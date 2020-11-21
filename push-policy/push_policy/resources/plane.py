@@ -8,5 +8,3 @@ class Plane:
         p.loadURDF(fileName=f_name,
                    basePosition=[0, 0, 0],
                    physicsClientId=client)
-
-
