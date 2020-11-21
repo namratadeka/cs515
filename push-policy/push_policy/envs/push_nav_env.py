@@ -12,7 +12,7 @@ from push_policy.resources.goal import Goal
 class PushNavEnv(gym.Env):
     metadata = {'render.modes': ['human']}
 
-    def __init__(self):
+    def __init__(self, mode:str = 'DIRECT'):
         self.action_space = gym.spaces.box.Box(
             low=np.array([0, -.6], dtype=np.float32),
             high=np.array([1, .6], dtype=np.float32))
@@ -21,7 +21,7 @@ class PushNavEnv(gym.Env):
             high=np.array([10, 10, 1, 1, 5, 5, 10, 10], dtype=np.float32))
         self.np_random, _ = gym.utils.seeding.np_random()
 
-        self.client = p.connect(p.DIRECT)
+        self.client = p.connect(eval("p.{}".format(mode.upper())))
         # Reduce length of episodes for RL algorithms
         p.setTimeStep(1/30, self.client)
 

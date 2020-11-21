@@ -1,1 +1,1 @@
-from push_policy.envs.push_policy_env import PushNavEnv
+from push_policy.envs.push_nav_env import PushNavEnv
