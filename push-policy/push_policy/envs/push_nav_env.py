@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 from push_policy.resources.car import Car
 from push_policy.resources.plane import Plane
 from push_policy.resources.goal import Goal
-from push_policy.resources.obstacle1 import Obstacle1
+from push_policy.resources.obstacles import Obstacles
 
 
 class PushNavEnv(gym.Env):
@@ -55,11 +55,11 @@ class PushNavEnv(gym.Env):
         elif dist_to_goal < 1:
             self.done = True
             reward = 50
-        # Negative reward if hits obstacle
-        dist_to_obs = math.sqrt(((car_ob[0] - self.obstacle[0]) ** 2 +
-                                 (car_ob[1] - self.obstacle[1]) ** 2))
-        if dist_to_obs < 1:
-            reward = -1
+        # # Negative reward if hits obstacle
+        # dist_to_obs = math.sqrt(((car_ob[0] - self.obstacle[0]) ** 2 +
+        #                          (car_ob[1] - self.obstacle[1]) ** 2))
+        # if dist_to_obs < 1:
+        #     reward = -1
 
         ob = np.array(car_ob + self.goal, dtype=np.float32)
         return ob, reward, self.done, dict()
@@ -85,15 +85,8 @@ class PushNavEnv(gym.Env):
         # Visual element of the goal
         Goal(self.client, self.goal)
 
-        # Set the obstacle to a random target
-        x = (self.np_random.uniform(3, 7) if self.np_random.randint(2) else
-             self.np_random.uniform(-3, -7))
-        y = (self.np_random.uniform(3, 7) if self.np_random.randint(2) else
-             self.np_random.uniform(-3, -7))
-        self.obstacle = (x, y)
-
-        # Visual element of the obstacle
-        Obstacle1(self.client, self.obstacle)
+        # Reset obstacles
+        Obstacles(self.client)
 
         self.done = False
 
