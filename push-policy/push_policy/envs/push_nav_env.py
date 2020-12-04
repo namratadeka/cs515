@@ -50,16 +50,12 @@ class PushNavEnv(gym.Env):
         # Done by running off boundaries
         if (car_ob[0] >= 10 or car_ob[0] <= -10 or
                 car_ob[1] >= 10 or car_ob[1] <= -10):
+            reward = -10
             self.done = True
         # Done by reaching goal
         elif dist_to_goal < 1:
             self.done = True
             reward = 50
-        # # Negative reward if hits obstacle
-        # dist_to_obs = math.sqrt(((car_ob[0] - self.obstacle[0]) ** 2 +
-        #                          (car_ob[1] - self.obstacle[1]) ** 2))
-        # if dist_to_obs < 1:
-        #     reward = -1
 
         ob = np.array(car_ob + self.goal, dtype=np.float32)
         return ob, reward, self.done, dict()
