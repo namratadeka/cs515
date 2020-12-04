@@ -11,7 +11,7 @@ class PPO:
         self.env = env
         self.act_dim = env.action_space.shape[0]
 
-        self.cov_var = torch.full(size=(self.act_dim), fill_value=0.5)
+        self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
         self.cov_mat = torch.diag(self.cov_var)
 
         self.actor = Actor(network_cfg)
@@ -29,7 +29,7 @@ class PPO:
         self.lr = 0.005
 
     def get_action(self, state, img):
-        mean = self.actor(state, img)
+        mean = self.actor(state, img).squeeze()
         dist = MultivariateNormal(mean, self.cov_mat)
 
         action = dist.sample()
@@ -48,7 +48,7 @@ class PPO:
         batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float)
         return batch_rtgs
 
-    def rollout(self);
+    def rollout(self):
         # batch data
         batch_obs_state = []                # batch states
         batch_obs_img = []                  # batch images
@@ -71,6 +71,7 @@ class PPO:
 
                 action, log_prob = self.get_action(state_obs, img_obs)
                 obs, rew, done, _ = self.env.step(action)
+                state_obs, img_obs = obs[0], obs[1]
 
                 ep_rews.append(rew)
                 batch_acts.append(action)
@@ -94,7 +95,7 @@ class PPO:
     def evaluate(self, state, img, acts):
         V = self.critic(state, img).squeeze()
 
-        mean = self.actor(state, img)
+        mean = self.actor(state, img).squeeze()
         dist = MultivariateNormal(mean, self.cov_mat)
         log_probs = dist.log_probs(acts)
 

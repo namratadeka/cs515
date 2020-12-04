@@ -59,7 +59,7 @@ class PushNavEnv(gym.Env):
             self.done = True
             reward = 50
 
-        ob = np.array(car_ob + self.goal, dtype=np.float32)
+        ob = (np.array(car_ob + self.goal, dtype=np.float32), cam_ob)
         return ob, reward, self.done, dict()
 
     def seed(self, seed=None):
@@ -94,7 +94,7 @@ class PushNavEnv(gym.Env):
 
         self.prev_dist_to_goal = math.sqrt(((car_ob[0] - self.goal[0]) ** 2 +
                                            (car_ob[1] - self.goal[1]) ** 2))
-        return np.array(car_ob + self.goal, dtype=np.float32)
+        return np.array(car_ob + self.goal, dtype=np.float32), cam_ob
 
     def visible_goal(self):
         return self.goalID in self.car.segmask

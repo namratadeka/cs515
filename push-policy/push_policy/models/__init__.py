@@ -1,1 +1,1 @@
-from actor_critic import Actor, Critic
+from push_policy.models.actor_critic import Actor, Critic
