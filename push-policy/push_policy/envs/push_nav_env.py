@@ -47,6 +47,9 @@ class PushNavEnv(gym.Env):
         reward = max(self.prev_dist_to_goal - dist_to_goal, 0)
         self.prev_dist_to_goal = dist_to_goal
 
+        # import pdb; pdb.set_trace()
+        reward =+ int(self.visible_goal())
+
         # Done by running off boundaries
         if (car_ob[0] >= 10 or car_ob[0] <= -10 or
                 car_ob[1] >= 10 or car_ob[1] <= -10):
@@ -79,7 +82,8 @@ class PushNavEnv(gym.Env):
         self.goal = (x, y)
 
         # Visual element of the goal
-        Goal(self.client, self.goal)
+        goal = Goal(self.client, self.goal)
+        self.goalID = goal.id
 
         # Reset obstacles
         Obstacles(self.client)
@@ -92,6 +96,9 @@ class PushNavEnv(gym.Env):
         self.prev_dist_to_goal = math.sqrt(((car_ob[0] - self.goal[0]) ** 2 +
                                            (car_ob[1] - self.goal[1]) ** 2))
         return np.array(car_ob + self.goal, dtype=np.float32)
+
+    def visible_goal(self):
+        return self.goalID in self.car.segmask
 
     def render(self, mode='human'):
         if self.rendered_img is None:
