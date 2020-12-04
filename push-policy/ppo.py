@@ -22,8 +22,8 @@ class PPO:
         self.critic_optim = torch.optim.Adam(self.critic.parameters(), lr=self.lr)
 
     def _init_hyperparameters(self):
-        self.timesteps_per_batch = 4000
-        self.max_timesteps_per_episode = 1500
+        self.timesteps_per_batch = 400
+        self.max_timesteps_per_episode = 150
         self.gamma = 0.95
         self.n_updates_per_iteration = 5
         self.clip = 0.2
@@ -38,7 +38,7 @@ class PPO:
 
         return action.detach().cpu().numpy(), log_prob.detach()
 
-    def compute_rtgs(self, rews):
+    def compute_rtgs(self, batch_rews):
         batch_rtgs = []
         for ep_rews in reversed(batch_rews):
             discounted_reward = 0
@@ -98,7 +98,7 @@ class PPO:
 
         mean = self.actor(state, img).squeeze()
         dist = MultivariateNormal(mean, self.cov_mat)
-        log_probs = dist.log_probs(acts)
+        log_probs = dist.log_prob(acts)
 
         return V, log_probs
 
@@ -108,9 +108,10 @@ class PPO:
             batch_obs_state, batch_obs_img, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout()
             t_so_far += np.sum(batch_lens)
 
-            V, _ = self.evaluate(batch_obs_state, batch_obs_img)
+            V, _ = self.evaluate(batch_obs_state, batch_obs_img, batch_acts)
 
             A_k = batch_rtgs - V.detach()
+            del V
 
             # normalize advantages
             A_k = (A_k - A_k.mean()) / (A_k.std() + 1e-10)
