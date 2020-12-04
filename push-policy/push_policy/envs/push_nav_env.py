@@ -15,8 +15,8 @@ class PushNavEnv(gym.Env):
 
     def __init__(self, mode:str = 'GUI'):
         self.action_space = gym.spaces.box.Box(
-            low=np.array([0, -.6], dtype=np.float32),
-            high=np.array([1, .6], dtype=np.float32))
+            low=np.array([-6, -.6], dtype=np.float32),
+            high=np.array([6, .6], dtype=np.float32))
         self.observation_space = gym.spaces.box.Box(
             low=np.array([-10, -10, -1, -1, -5, -5, -10, -10], dtype=np.float32),
             high=np.array([10, 10, 1, 1, 5, 5, 10, 10], dtype=np.float32))

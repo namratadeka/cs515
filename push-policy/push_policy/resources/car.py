@@ -32,7 +32,7 @@ class Car:
         throttle, steering_angle = action
 
         # Clip throttle and steering angle to reasonable values
-        throttle = min(max(throttle, 0), 1)
+        throttle = min(max(throttle, -6), 6)
         steering_angle = max(min(steering_angle, 0.6), -0.6)
 
         # Set the steering joint positions
@@ -105,6 +105,6 @@ class Car:
 
         observation += tuple(collision_force.tolist())
         rgbd = self.get_camera_image()
-        
+
         return observation, rgbd
         
