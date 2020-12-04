@@ -104,8 +104,12 @@ class PPO:
 
     def learn(self, total_timesteps):
         t_so_far = 0
+        itr = 0
         while t_so_far < total_timesteps:
             batch_obs_state, batch_obs_img, batch_acts, batch_log_probs, batch_rtgs, batch_lens = self.rollout()
+
+            print("[{}] Average episodic reward: {}".format(itr, batch_rtgs.mean().item()))
+            itr += 1
             t_so_far += np.sum(batch_lens)
 
             V, _ = self.evaluate(batch_obs_state, batch_obs_img, batch_acts)
