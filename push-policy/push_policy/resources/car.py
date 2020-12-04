@@ -32,7 +32,7 @@ class Car:
         throttle, steering_angle = action
 
         # Clip throttle and steering angle to reasonable values
-        throttle = min(max(throttle, -6), 6)
+        throttle = min(max(throttle, -1), 1)
         steering_angle = max(min(steering_angle, 0.6), -0.6)
 
         # Set the steering joint positions
@@ -48,8 +48,6 @@ class Car:
         acceleration = self.c_throttle * throttle + friction
         # Each time step is 1/240 of a second
         self.joint_speed = self.joint_speed + 1/30 * acceleration
-        if self.joint_speed < 0:
-            self.joint_speed = 0
 
         # Set the velocity of the wheel joints directly
         p.setJointMotorControlArray(

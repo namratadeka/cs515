@@ -17,5 +17,5 @@ class Obstacles:
                     self.np_random.uniform(1, 2.5))
 
                 p.loadURDF(fileName=obs,
-                           basePosition=[x+0.5, y+0.5, 0],
+                           basePosition=[x, y, 0],
                            physicsClientId=client)
