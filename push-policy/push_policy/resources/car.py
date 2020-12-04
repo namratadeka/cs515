@@ -1,15 +1,17 @@
 import pybullet as p
 import os
 import math
+import numpy as np 
 
 
 class Car:
     def __init__(self, client):
         self.client = client
-        f_name = os.path.join(os.path.dirname(__file__), 'simplecar.urdf')
+        f_name = os.path.join(os.path.dirname(__file__), 'car.urdf')
         self.car = p.loadURDF(fileName=f_name,
                               basePosition=[0, 0, 0.1],
                               physicsClientId=client)
+        p.enableJointForceTorqueSensor(self.car, 0, True)
 
         # Joint indices as found by p.getJointInfo()
         self.steering_joints = [0, 2]
@@ -70,5 +72,16 @@ class Car:
         # Concatenate position, orientation, velocity
         observation = (pos + ori + vel)
 
+        collision_force = np.zeros(3)
+        contact_points = p.getContactPoints(bodyA=self.car)
+        for contact_info in contact_points:
+            bodyB = contact_info[2]
+            bodyA_index = contact_info[3]
+            if bodyB != self.car and bodyA_index == -1:
+                contact_force = contact_info[9]
+                contact_normal = contact_info[7]
+                collision_force += np.array(contact_normal) * contact_force
+
+        observation += tuple(collision_force.tolist())
         return observation
         
