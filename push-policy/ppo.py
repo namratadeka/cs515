@@ -6,16 +6,17 @@ from push_policy.models import Actor, Critic
 
 class PPO:
     def __init__(self, env, network_cfg):
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
         self._init_hyperparameters()
         
         self.env = env
         self.act_dim = env.action_space.shape[0]
 
         self.cov_var = torch.full(size=(self.act_dim,), fill_value=0.5)
-        self.cov_mat = torch.diag(self.cov_var)
+        self.cov_mat = torch.diag(self.cov_var).to(self.device)
 
-        self.actor = Actor(network_cfg)
-        self.critic = Critic(network_cfg)
+        self.actor = Actor(network_cfg).to(self.device)
+        self.critic = Critic(network_cfg).to(self.device)
 
         self.actor_optim = torch.optim.Adam(self.actor.parameters(), lr=self.lr)
         self.critic_optim = torch.optim.Adam(self.critic.parameters(), lr=self.lr)
@@ -35,7 +36,7 @@ class PPO:
         action = dist.sample()
         log_prob = dist.log_prob(action)
 
-        return action.detach().numpy(), log_prob.detach()
+        return action.detach().cpu().numpy(), log_prob.detach()
 
     def compute_rtgs(self, rews):
         batch_rtgs = []
@@ -45,7 +46,7 @@ class PPO:
                 discounted_reward = rew + discounted_reward * self.gamma
                 batch_rtgs.insert(0, discounted_reward)
 
-        batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float)
+        batch_rtgs = torch.tensor(batch_rtgs, dtype=torch.float).to(self.device)
         return batch_rtgs
 
     def rollout(self):
@@ -83,10 +84,10 @@ class PPO:
             batch_lens.append(ep_t + 1)
             batch_rews.append(ep_rews)
 
-        batch_obs_state = torch.tensor(batch_obs_state, dtype=torch.float)
-        batch_obs_img = torch.tensor(batch_obs_img, dtype=torch.float)
-        batch_acts = torch.tensor(batch_acts, dtype=torch.float)
-        batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float)
+        batch_obs_state = torch.tensor(batch_obs_state, dtype=torch.float).to(self.device)
+        batch_obs_img = torch.tensor(batch_obs_img, dtype=torch.float).to(self.device)
+        batch_acts = torch.tensor(batch_acts, dtype=torch.float).to(self.device)
+        batch_log_probs = torch.tensor(batch_log_probs, dtype=torch.float).to(self.device)
 
         batch_rtgs = self.compute_rtgs(batch_rews)
 

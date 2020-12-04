@@ -14,7 +14,7 @@ from ppo import PPO
 
 def main(cfile):
     cfg = yaml.load(open(cfile, "r"), Loader=yaml.FullLoader)
-    env = gym.make('PushNav-v0')
+    env = gym.make('PushNav-v0', mode='gui')
 
     agent = PPO(env, cfg['network'])
 

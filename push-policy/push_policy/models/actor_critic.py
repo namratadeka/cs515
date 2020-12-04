@@ -8,15 +8,16 @@ from push_policy.models.network import Network
 class Actor(nn.Module):
 	def __init__(self, cfg):
 		super(Actor, self).__init__()
+		self.device = "cuda" if torch.cuda.is_available() else "cpu"
 		self.state_fc = Network(cfg["state_fc"])
 		self.cnn = Network(cfg["cnn"])
 		self.actor_fc = Network(cfg["actor_fc"])
 
 	def forward(self, state, image):
 		if isinstance(state, np.ndarray):
-			state = torch.tensor(state, dtype=torch.float).unsqueeze(0)
+			state = torch.tensor(state, dtype=torch.float).unsqueeze(0).to(self.device)
 		if isinstance(image, np.ndarray):
-			image = torch.tensor(image, dtype=torch.float).permute(2, 0, 1).unsqueeze(0)
+			image = torch.tensor(image, dtype=torch.float).permute(2, 0, 1).unsqueeze(0).to(self.device)
 
 		state_features = self.state_fc(state)
 		img_features = self.cnn(image)
@@ -35,9 +36,9 @@ class Critic(nn.Module):
 
 	def forward(self, state, image):
 		if isinstance(state, np.ndarray):
-			state = torch.tensor(state, dtype=torch.float).unsqueeze(0)
+			state = torch.tensor(state, dtype=torch.float).unsqueeze(0).to(self.device)
 		if isinstance(image, np.ndarray):
-			image = torch.tensor(image, dtype=torch.float).permute(2, 0, 1).unsqueeze(0)
+			image = torch.tensor(image, dtype=torch.float).permute(2, 0, 1).unsqueeze(0).to(self.device)
 
 		state_features = self.state_fc(state)
 		img_features = self.cnn(image)

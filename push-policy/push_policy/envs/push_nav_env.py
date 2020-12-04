@@ -47,7 +47,7 @@ class PushNavEnv(gym.Env):
         reward = max(self.prev_dist_to_goal - dist_to_goal, 0)
         self.prev_dist_to_goal = dist_to_goal
 
-        reward =+ int(self.visible_goal())
+        reward =+ self.visible_goal()
 
         # Done by running off boundaries
         if (car_ob[0] >= 10 or car_ob[0] <= -10 or
@@ -97,7 +97,7 @@ class PushNavEnv(gym.Env):
         return np.array(car_ob + self.goal, dtype=np.float32), cam_ob
 
     def visible_goal(self):
-        return self.goalID in self.car.segmask
+        return np.array(self.car.segmask == self.goalID, dtype=np.int32).sum()
 
     def render(self, mode='human'):
         if self.rendered_img is None:
