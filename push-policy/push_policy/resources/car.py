@@ -60,6 +60,26 @@ class Car:
             forces=[1.2] * 4,
             physicsClientId=self.client)
 
+    def get_camera_image(self):
+        image = np.zeros((100, 100, 4))
+        proj_matrix = p.computeProjectionMatrixFOV(fov=80, aspect=1,
+                                                   nearVal=0.01, farVal=100)
+        pos, ori = [list(l) for l in
+                    p.getBasePositionAndOrientation(self.car, self.client)]
+        pos[2] = 0.2
+
+        # Rotate camera direction
+        rot_mat = np.array(p.getMatrixFromQuaternion(ori)).reshape(3, 3)
+        camera_vec = np.matmul(rot_mat, [1, 0, 0])
+        up_vec = np.matmul(rot_mat, np.array([0, 0, 1]))
+        view_matrix = p.computeViewMatrix(pos, pos + camera_vec, up_vec)
+
+        w, h, rgb, depth, seg = p.getCameraImage(100, 100, view_matrix, proj_matrix)
+        rgb = rgb[:, :, :-1] / 255.
+        rgbd = np.concatenate([rgb, np.expand_dims(depth, 2)], axis=2)
+
+        return rgbd
+
     def get_observation(self):
         # Get the position and orientation of the car in the simulation
         pos, ang = p.getBasePositionAndOrientation(self.car, self.client)
@@ -72,6 +92,7 @@ class Car:
         # Concatenate position, orientation, velocity
         observation = (pos + ori + vel)
 
+        # Get contact forces of obstacles with the base link
         collision_force = np.zeros(3)
         contact_points = p.getContactPoints(bodyA=self.car)
         for contact_info in contact_points:
@@ -83,5 +104,7 @@ class Car:
                 collision_force += np.array(contact_normal) * contact_force
 
         observation += tuple(collision_force.tolist())
-        return observation
+        rgbd = self.get_camera_image()
+        
+        return observation, rgbd
         
