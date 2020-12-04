@@ -47,7 +47,6 @@ class PushNavEnv(gym.Env):
         reward = max(self.prev_dist_to_goal - dist_to_goal, 0)
         self.prev_dist_to_goal = dist_to_goal
 
-        # import pdb; pdb.set_trace()
         reward =+ int(self.visible_goal())
 
         # Done by running off boundaries
